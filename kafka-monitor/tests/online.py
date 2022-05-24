@@ -60,6 +60,7 @@ class TestKafkaMonitor(TestCase):
             host=self.kafka_monitor.settings['REDIS_HOST'],
             port=self.kafka_monitor.settings['REDIS_PORT'],
             db=self.kafka_monitor.settings['REDIS_DB'],
+            password=self.kafka_monitor.settings['REDIS_PASSWORD'],
             decode_responses=True)
 
     def test_feed(self):
@@ -70,7 +71,6 @@ class TestKafkaMonitor(TestCase):
         self.kafka_monitor._process_messages()
         self.kafka_monitor.feed(parsed)
 
-    def test_run(self):
         self.kafka_monitor._process_messages()
         self.assertTrue(self.redis_conn.exists("cluster:test"))
         value = self.redis_conn.get("cluster:test")

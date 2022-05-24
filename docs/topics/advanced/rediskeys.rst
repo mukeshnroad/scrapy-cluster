@@ -22,6 +22,11 @@ Production
 
 - **rest:poll:<uuid>** - Allows a response caught by a separate Rest service to be stored within Redis to be later retrived by a ``poll`` request to another. Useful when running multiple Rest processes behind a load balancer with jobs that are longer than the initial call timeout.
 
+- **<spiderid>:domain_max_page_filter:<domain>:<crawlid>** - Used by the per crawl job page count domain filter to ensure the maximum number of pages to crawl per domain for any single crawlid are not exceeded.
+
+- **<spiderid>:global_page_count_filter:<domain>:<crawlid>** - Used by the global page count domain filter to ensure the cluster-wide settings for the maximum number of pages to crawl per domain are not exceeded for any given request.
+
+
 Redis Monitor Jobs
 ^^^^^^^^^^^^^^^^^^
 
@@ -69,6 +74,6 @@ If you run the integration tests, there may be temporary Redis keys created that
 
 - **cluster:test** - Used when testing the Kafka Monitor can act and set a key in Redis
 
-- **test-spider:istresearch.com:queue** - Used when testing the crawler installation can interact with Redis and Kafka
+- **test-spider:dmoztools.net:queue** - Used when testing the crawler installation can interact with Redis and Kafka
 
 - **stats:crawler:<hostname>:test-spider:<window>** - Automatically created and destoryed during crawler testing by the stats collection mechanism settings.

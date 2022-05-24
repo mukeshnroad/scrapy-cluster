@@ -64,3 +64,6 @@ docker-compose.override.yml
 
 # IDE stuff
 .idea
+
+klag_conf.json
+

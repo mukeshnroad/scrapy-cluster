@@ -124,7 +124,10 @@ class KafkaMonitor(object):
         redis_conn = redis.Redis(host=self.settings['REDIS_HOST'],
                                  port=self.settings['REDIS_PORT'],
                                  db=self.settings.get('REDIS_DB'),
-                                 decode_responses=True)
+                                 password=self.settings['REDIS_PASSWORD'],
+                                 decode_responses=True,
+                                 socket_timeout=self.settings.get('REDIS_SOCKET_TIMEOUT'),
+                                 socket_connect_timeout=self.settings.get('REDIS_SOCKET_TIMEOUT'))
 
         try:
             redis_conn.info()

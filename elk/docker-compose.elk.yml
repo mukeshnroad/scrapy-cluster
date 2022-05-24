@@ -57,8 +57,9 @@ services:
     ports:
       - "6379"
     restart: always
+    # command: redis-server --requirepass redispassword
   zookeeper:
-    image: zookeeper
+    image: wurstmeister/zookeeper
     ports:
       - "2181:2181"
     restart: always
@@ -69,6 +70,7 @@ services:
     environment:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_ADVERTISED_HOST_NAME: kafka
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
@@ -80,6 +82,7 @@ services:
     ports:
       - "9200:9200"
       - "9300:9300"
+    restart: always
   logstash:
     image: logstash:5.2
     command: logstash -f /etc/logstash/conf.d/logstash.conf
@@ -91,12 +94,14 @@ services:
       - "5000:5000"
     links:
       - elasticsearch
+    restart: always
   kibana:
     image: kibana:5.2
     ports:
       - "5601:5601"
     links:
       - elasticsearch
+    restart: always
 
 volumes:
   logs:

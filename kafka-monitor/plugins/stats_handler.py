@@ -16,7 +16,10 @@ class StatsHandler(BaseHandler):
         self.redis_conn = redis.Redis(host=settings['REDIS_HOST'],
                                       port=settings['REDIS_PORT'],
                                       db=settings.get('REDIS_DB'),
-                                      decode_responses=True)
+                                      password=settings['REDIS_PASSWORD'],
+                                      decode_responses=True,
+                                      socket_timeout=settings.get('REDIS_SOCKET_TIMEOUT'),
+                                      socket_connect_timeout=settings.get('REDIS_SOCKET_TIMEOUT'))
 
         try:
             self.redis_conn.info()
