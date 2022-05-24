@@ -47,6 +47,11 @@ six==1.11.0  # Updated from 1.10.0
 testfixtures==6.0.2  # Updated from 5.1.1
 tldextract==2.2.0  # Updated from 2.1.0
 ujson==1.35
+
+# Generated with piprot 0.9.7
+plotly==2.0.12
+flask_table==0.4.1
+
 w3lib==1.19.0  # Updated from 1.18.0
 zope.interface==4.5.0  # Updated from 4.4.2
-# Generated with piprot 0.9.10
+

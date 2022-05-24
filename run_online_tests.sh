@@ -9,7 +9,11 @@ PORT=6379
 PASSWORD='None'
 ZOOKEEPER_HOST='localhost:2181'
 
-if [ $# -ne 4 ]
+export PYTHONPATH='.'
+
+if [ $# -ne 3 ]
+
+
   then
     echo "---- Running utils online test with redis on localhost:6379 with password: None and zookeeper on localhost:2181"
     echo "Other usage:"
@@ -56,3 +60,12 @@ if [ $? -eq 1 ]; then
     echo "rest tests failed"
     exit 1
 fi
+python rest_service.py & export APP_PID=$!
+sleep 5
+cd ../ui
+python tests/online.py -v
+if [ $? -eq 1 ]; then
+    echo "ui tests failed"
+    exit 1
+fi
+kill $APP_PID

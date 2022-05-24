@@ -8,7 +8,116 @@ Quick Start
 Setup
 -----
 
-There are several options available to set up Scrapy Cluster. You can choose to provision with the `Docker Quickstart`_, or manually configure it via the `Cluster Quickstart`_ yourself.
+
+There are a number of different options available to set up Scrapy Cluster. You can chose to provision with `Vagrant Quickstart`_, use the `Docker Quickstart`_, or manually configure via the `Cluster Quickstart`_ yourself.
+
+.. _vagrant_setup:
+
+Vagrant Quickstart
+^^^^^^^^^^^^^^^^^^
+
+The Vagrant Quickstart provides you a simple Vagrant Virtual Machine in order to try out Scrapy Cluster. It is not meant to be a production crawling machine, and should be treated more like a test ground for development.
+
+1) Ensure you have Vagrant and VirtualBox installed on your machine. For instructions on setting those up please refer to the official documentation.
+
+2) Download the latest ``master`` branch release via
+
+::
+
+  git clone https://github.com/istresearch/scrapy-cluster.git
+  # or
+  git clone git@github.com:istresearch/scrapy-cluster.git
+
+You may also use the pre-packaged git `releases <https://github.com/istresearch/scrapy-cluster/releases>`_, however the latest commit on the ``master`` branch will always have to most up to date code or minor tweaks that do not deserve another release.
+
+Lets assume our project is now in ``~/scrapy-cluster``
+
+3) Stand up the Scrapy Cluster Vagrant machine. By default this will start an **Ubuntu** virtual machine. If you would like to us **CentOS**, change the following line in the ``Vagrantfile`` in the root of the project
+
+::
+
+    node.vm.box = 'centos/7'
+
+Bring the machine up.
+
+::
+
+    $ cd ~/scrapy-cluster
+    $ vagrant up
+    # This will set up your machine, provision it with Ansible, and boot the required services
+
+.. note:: The initial setup may take some time due to the setup of Zookeeper, Kafka, and Redis. This is only a one time setup and is skipped when running it in the future.
+
+4) SSH onto the machine
+
+::
+
+    $ vagrant ssh
+
+5) Ensure everything under supervision is running.
+
+::
+
+    vagrant@scdev:~$ sudo supervisorctl status
+    kafka                            RUNNING   pid 1812, uptime 0:00:07
+    redis                            RUNNING   pid 1810, uptime 0:00:07
+    zookeeper                        RUNNING   pid 1809, uptime 0:00:07
+
+.. note:: If you receive the message ``unix:///var/run/supervisor.sock no such file``, issue the following command to start Supervisord: ``sudo service supervisord start``, then check the status like above.
+
+6) Create a `Virtual Environment <https://virtualenv.pypa.io/en/latest/>`_ for Scrapy Cluster, and activate it. This is where the python packages will be installed to.
+
+::
+
+    vagrant@scdev:~$ virtualenv sc
+    ...
+    vagrant@scdev:~$ source sc/bin/activate
+
+7) The Scrapy Cluster folder is mounted in the ``/vagrant/`` directory
+
+::
+
+    (sc) vagrant@scdev:~$ cd /vagrant/
+
+8) Install the Scrapy Cluster packages
+
+::
+
+    (sc) vagrant@scdev:/vagrant$ pip install -r requirements.txt
+
+9) Ensure the offline tests pass
+
+::
+
+    (sc) vagrant@scdev:/vagrant$ ./run_offline_tests.sh
+    # There should be 6 core pieces, each of them saying all tests passed like so
+    ----------------------------------------------------------------------
+    Ran 20 tests in 0.034s
+    ...
+    ----------------------------------------------------------------------
+    Ran 9 tests in 0.045s
+    ...
+
+10) Ensure the online tests pass
+
+::
+
+    (sc) vagrant@scdev:/vagrant$ ./run_online_tests.sh
+    # There should be 5 major blocks here, ensuring your cluster is setup correctly.
+    ...
+    ----------------------------------------------------------------------
+    Ran 2 tests in 0.105s
+    ...
+    ----------------------------------------------------------------------
+    Ran 1 test in 26.489s
+
+
+.. warning:: If this test fails, it most likely means the Virtual Machine's Kafka is in a finicky state. Issue the following command and then retry the online test to fix Kafka: ``sudo supervisorctl restart kafka``
+
+
+You now appear to have a working test environment, so jump down to `Your First Crawl`_ to finish the quickstart.
+=======
+
 
 .. _docker_setup:
 
@@ -61,6 +170,12 @@ At the time of writing, there is no Docker container to interface and run all of
 
     $ docker exec -it scrapy-cluster_rest_1 bash
 
+  UI
+
+  ::
+
+    $ docker exec -it scrapycluster_ui_1 bash
+
 5) Run the unit and integration test for that component. Note that your output may be slightly different but your tests should pass consistently.
 
 ::
@@ -108,7 +223,7 @@ Let's assume our project is now in ``~/scrapy-cluster``
 ::
 
     $ ./run_offline_tests.sh
-    # There should be 5 core pieces, each of them saying all tests passed like so
+    # There should be 6 core pieces, each of them saying all tests passed like so
     ----------------------------------------------------------------------
     Ran 20 tests in 0.034s
     ...
@@ -253,6 +368,34 @@ Add the following fields to override the defaults
 
     OK
 
+13) You can also set up the Admin UI to connect to the rest service
+
+::
+
+    $ cd ../ui/
+    $ vi localsettings.py
+
+Add the following fields to override the defaults
+
+::
+
+    # Here, 'scdev' is the host with the rest service
+    REST_HOST = 'scdev'
+
+14) Run the online integration tests to see if the ui service works.
+
+::
+
+    $ python tests/online.py -v
+    ...
+    ok
+
+    ----------------------------------------------------------------------
+    Ran 1 test in 11.309s
+
+    OK
+
+
 Your First Crawl
 ----------------
 
@@ -308,6 +451,12 @@ The following commands outline what you would run in a traditional environment. 
     ::
 
         python rest_service.py
+
+- The Admin UI (1):
+
+    ::
+
+        python ui_service.py
 
 -  The dump utility located in Kafka Monitor to see your crawl results
 
